@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">Mineee alpha</string>
+    <string name="title_activity_mineee_splash">Mineee</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_feed_main">FeedMainActivity</string>
+    <string name="facebook_app_id">697861076991683</string>
+    <string name="title_activity_tabbed_feed">Mineee!!!!!!</string>
+
+
+    <string name="title_section1">News Feed</string>
+    <string name="title_section2">Profile</string>
+    <string name="title_section3">Setting</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="setting_fragment">Setting fragment........ Coming Soon!!!!!!!!</string>
+    <string name="title_activity_upload_thing">Add Thing</string>
+
+    <string name="add_thing_dialog_title">Open</string>
+    <string name="add_thing_dialog_camera">Camera</string>
+    <string name="add_thing_dialog_gallery">Gallery</string>
+</resources>
