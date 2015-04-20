@@ -147,6 +147,7 @@ public class NewsFeedListFragment extends Fragment {
                     data = data.replace("(","");
                     data = data.replace(")","");
                     parseJsonFeed(new JSONArray(data));
+
                 } catch (JSONException e) {
                     e.printStackTrace();
 
