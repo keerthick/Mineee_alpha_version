@@ -149,6 +149,7 @@ public class NewsFeedListFragment extends Fragment {
                     parseJsonFeed(new JSONArray(data));
                 } catch (JSONException e) {
                     e.printStackTrace();
+
                 }
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
