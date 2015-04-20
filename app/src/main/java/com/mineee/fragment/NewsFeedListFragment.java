@@ -70,7 +70,7 @@ public class NewsFeedListFragment extends Fragment {
     private Uri fileUri;
 
     public NewsFeedListFragment(){
-        System.out.println("NewsFeedListFragment");
+        Log.d(TAG,"NewsFeedListFragment");
     }
 
     /**
@@ -133,12 +133,18 @@ public class NewsFeedListFragment extends Fragment {
         pDialog.setMessage("Loading...");
         pDialog.show();
 
+        fetchJson(URL_FEED,true);
+
+        return rootView;
+    }
+
+    private void fetchJson(String URL_FEED, boolean loadFromCache){
         // We first check for cached request
         Cache cache = FeedListAppController.getInstance().getRequestQueue().getCache();
         Cache.Entry entry = cache.get(URL_FEED);
 
         //entry = null;
-        if (entry != null) {
+        if (entry != null && loadFromCache) {
             // fetch the data from cache
             try {
                 String data = new String(entry.data, "UTF-8");
@@ -147,6 +153,7 @@ public class NewsFeedListFragment extends Fragment {
                     data = data.replace("(","");
                     data = data.replace(")","");
                     parseJsonFeed(new JSONArray(data));
+
                 } catch (JSONException e) {
                     e.printStackTrace();
 
@@ -155,37 +162,30 @@ public class NewsFeedListFragment extends Fragment {
                 e.printStackTrace();
             }
 
-        }else{
+        }else {
             // making fresh volley request and getting json
+            JsonPArrayRequest jsonReq = new JsonPArrayRequest(URL_FEED, new Response.Listener<JSONArray>() {
 
-            fetchJson();
-        }
-
-        return rootView;
-    }
-
-    private void fetchJson(){
-        JsonPArrayRequest jsonReq = new JsonPArrayRequest(URL_FEED, new Response.Listener<JSONArray>() {
-
-            @Override
-            public void onResponse(JSONArray response) {
-                VolleyLog.d(TAG, "Response: " + response.toString());
-                if (response != null) {
-                    hidePDialog();
-                    parseJsonFeed(response);
+                @Override
+                public void onResponse(JSONArray response) {
+                    VolleyLog.d(TAG, "Response: " + response.toString());
+                    if (response != null) {
+                        hidePDialog();
+                        parseJsonFeed(response);
+                    }
                 }
-            }
-        }, new Response.ErrorListener() {
+            }, new Response.ErrorListener() {
 
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                VolleyLog.d(TAG, "Error: " + error.getMessage());
-                hidePDialog();
-            }
-        });
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    VolleyLog.d(TAG, "Error: " + error.getMessage());
+                    hidePDialog();
+                }
+            });
 
-        // Adding request to volley request queue
-        FeedListAppController.getInstance().addToRequestQueue(jsonReq);
+            // Adding request to volley request queue
+            FeedListAppController.getInstance().addToRequestQueue(jsonReq);
+        }
     }
     /**
      * Parsing json reponse and passing the data to feed view list adapter
@@ -207,22 +207,9 @@ public class NewsFeedListFragment extends Fragment {
                 item.setName(feedObj.getString("name"));
                 item.setImage_path(feedObj.getString("image_folder"));
                 item.setOptionString(feedObj.getString("up_option"));
-                //item.setFeedUserId(feedObj.getInt("id"));
-                //item.setName(feedObj.getString("name"));
-
-                // Image might be null sometimes
-                //String image = feedObj.isNull("image") ? null : feedObj
-                  //      .getString("image");
-                //item.setImge(image);
                 item.setLikeCount(feedObj.getString("likeCount"));
                 item.setDescription(feedObj.getString("description"));
-                //item.setProfilePic(feedObj.getString("profilePic"));
                 item.setTimeStamp(feedObj.getString("dt_ct"));
-
-                // url might be null sometimes
-                /*String feedUrl = feedObj.isNull("url") ? null : feedObj
-                        .getString("url");
-                item.setUrl(feedUrl);*/
 
                 feedList.add(item);
             }
@@ -246,14 +233,11 @@ public class NewsFeedListFragment extends Fragment {
 
         File mediaStorageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
 
-        Log.d("CAMERA",mediaStorageDir.getPath());
         // Create a media file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss",
                 Locale.getDefault()).format(new Date());
         File mediaFile;
         mediaFile = new File(mediaStorageDir.getPath() + File.separator + "IMG_" + timeStamp + ".jpg");
-
-        Log.d("mediaFile",mediaFile.getPath());
 
         return Uri.fromFile(mediaFile);
     }
@@ -264,9 +248,10 @@ public class NewsFeedListFragment extends Fragment {
 
         if (requestCode == RESULT_LOAD_IMAGE && resultCode == Activity.RESULT_OK && null != data) {
 
-
             Uri selectedImage = data.getData();
             String[] filePathColumn = { MediaStore.Images.Media.DATA };
+
+            Log.d(TAG,selectedImage.getPath());
 
             // Get the cursor
             Cursor cursor = getActivity().getContentResolver().query(selectedImage,
@@ -278,39 +263,23 @@ public class NewsFeedListFragment extends Fragment {
             String imgPath = cursor.getString(columnIndex);
             cursor.close();
 
-            Log.d("URI imgPath",imgPath);
-
             Intent uploadAct = new Intent(getActivity(), UploadThingActivity.class);
             uploadAct.putExtra("imgPath",imgPath);
             startActivityForResult(uploadAct, ADD_NEW_ITEM_RELOAD);
         }
         if (requestCode == RESULT_LOAD_CAMERA && resultCode == Activity.RESULT_OK ) {
 
+            Log.d(TAG,fileUri.getPath());
 
-
-            String[] filePathColumn = { MediaStore.Images.Media.DATA };
-
-            Log.d("URI",fileUri.getPath());
-
-            // Get the cursor
-            /*Cursor cursor = getActivity().getContentResolver().query(fileUri,
-                    filePathColumn, null, null, null);
-            // Move to first row
-            cursor.moveToFirst();
-*/
-            //fileUri.get
-            //int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-            String imgPath = fileUri.getPath();//cursor.getString(columnIndex);
-            //cursor.close();
+            String imgPath = fileUri.getPath();
 
             Intent uploadAct = new Intent(getActivity(), UploadThingActivity.class);
             uploadAct.putExtra("imgPath",imgPath);
-            startActivity(uploadAct);
+            startActivityForResult(uploadAct, ADD_NEW_ITEM_RELOAD);
         }
 
         if(requestCode == ADD_NEW_ITEM_RELOAD && resultCode == Activity.RESULT_OK ){
-            fetchJson();
-
+            fetchJson(URL_FEED+"&random="+Math.random(),false);
         }
     }
 }
