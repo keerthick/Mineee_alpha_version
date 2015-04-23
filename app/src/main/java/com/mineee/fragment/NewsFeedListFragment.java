@@ -138,12 +138,12 @@ public class NewsFeedListFragment extends Fragment {
         return rootView;
     }
 
-    private void fetchJson(String URL_FEED, boolean loadFromCache){
+    private void fetchJson(final String URL_FEED, boolean loadFromCache){
         // We first check for cached request
         Cache cache = FeedListAppController.getInstance().getRequestQueue().getCache();
         Cache.Entry entry = cache.get(URL_FEED);
 
-        //entry = null;
+        entry = null;
         if (entry != null && loadFromCache) {
             // fetch the data from cache
             try {
@@ -171,6 +171,7 @@ public class NewsFeedListFragment extends Fragment {
                     VolleyLog.d(TAG, "Response: " + response.toString());
                     if (response != null) {
                         hidePDialog();
+                        feedList.clear();
                         parseJsonFeed(response);
                     }
                 }
@@ -179,6 +180,7 @@ public class NewsFeedListFragment extends Fragment {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     VolleyLog.d(TAG, "Error: " + error.getMessage());
+                    Log.d(TAG,URL_FEED);
                     hidePDialog();
                 }
             });

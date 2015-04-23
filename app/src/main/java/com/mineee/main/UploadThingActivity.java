@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -19,6 +20,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.loopj.android.http.AsyncHttpClient;
@@ -52,6 +54,7 @@ public class UploadThingActivity extends ActionBarActivity implements View.OnCli
     Spinner option;
     String URL_ADD= "http://mineee.com/api/upload.php";
     public static final int RESULT_LOAD_IMAGE = 101;
+    public static final String TAG = UploadThingActivity.class.getSimpleName();
 
 
     private static Map<String,String> optionMap;
@@ -95,24 +98,30 @@ public class UploadThingActivity extends ActionBarActivity implements View.OnCli
         optionMap.put("I Want this product.","3");
         optionMap.put("I Recommend this product.","5");
 
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.hide();
+
         setContentView(R.layout.activity_upload_thing);
 
-        Intent i = getIntent();
 
+
+        Intent i = getIntent();
         imgPath = i.getStringExtra("imgPath");
+
         if(imgPath != null && !"".equals(imgPath)) {
             ImageView imgView = (ImageView) findViewById(R.id.imageView);
             // Set the Image in ImageView
             imgView.setImageBitmap(BitmapFactory
                     .decodeFile(imgPath));
         }
+
         prgDialog = new ProgressDialog(this);
         // Set Cancelable as False
         prgDialog.setCancelable(false);
-        Button browse = (Button)findViewById(R.id.browse);
+        //Button browse = (Button)findViewById(R.id.browse);
         upload = (Button)findViewById(R.id.send);
         upload.setActivated(false);
-        browse.setOnClickListener(this);
+//        browse.setOnClickListener(this);
         upload.setOnClickListener(this);
         prodName = (EditText)findViewById(R.id.name);
         descr = (EditText)findViewById(R.id.desc);
@@ -120,8 +129,11 @@ public class UploadThingActivity extends ActionBarActivity implements View.OnCli
         cat = (MultiSelectSpinner)findViewById(R.id.catSpin);
         option = (Spinner) findViewById(R.id.optionSpinner);
 
-        cat.setItems(categories);
         cat.setPrompt("None Selected");
+        cat.setItems(categories);
+
+        Log.d(TAG,(String)cat.getPrompt());
+
 
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item, optionValues);
@@ -259,8 +271,13 @@ public class UploadThingActivity extends ActionBarActivity implements View.OnCli
                     public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                         // Hide Progress Dialog
                         prgDialog.hide();
-                        Toast.makeText(getApplicationContext(), new String(responseBody),
-                                Toast.LENGTH_LONG).show();
+                        /*Toast.makeText(getApplicationContext(), "",
+                                Toast.LENGTH_LONG).show();*/
+
+                        Intent returnIntent = new Intent();
+                        //returnIntent.putExtra("result",result);
+                        setResult(RESULT_OK,returnIntent);
+                        finish();
                     }
 
                     // When the response returned by REST has Http
@@ -309,13 +326,13 @@ public class UploadThingActivity extends ActionBarActivity implements View.OnCli
     public void onClick(View v) {
         switch (v.getId()) {
 
-            case R.id.browse:
+            /*case R.id.browse:
                 Intent i = new Intent(
                         Intent.ACTION_PICK,
                         android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 
                 startActivityForResult(i, RESULT_LOAD_IMAGE);
-                break;
+                break;*/
 
             case R.id.send:
                 if(isValidRequest()) {
@@ -394,16 +411,25 @@ public class UploadThingActivity extends ActionBarActivity implements View.OnCli
         if(isNull(prodName)){
             prodName.setFocusableInTouchMode(true);
             prodName.setFocusable(true);
+            prodName.setError("Product Name is required");
             return false;
         }
         if (isNull(cat)){
             cat.setFocusableInTouchMode(true);
             cat.setFocusable(true);
+            View selectedView = cat.getSelectedView();
+            if (selectedView != null && selectedView instanceof TextView) {
+                TextView selectedTextView = (TextView) selectedView;
+                selectedTextView.setError("Category is required field");
+
+                Log.d(TAG,"Category is required field");
+            }
             return false;
         }
         if (isNull(option)){
             option.setFocusableInTouchMode(true);
             option.setFocusable(true);
+
             return false;
         }
 

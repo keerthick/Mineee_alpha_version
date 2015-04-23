@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,8 +18,9 @@ import com.android.volley.toolbox.NetworkImageView;
 import com.mineee.controller.FeedListAppController;
 import com.mineee.main.R;
 import com.mineee.modal.UserProfileData;
-import com.mineee.util.JsonPObjectRequest;
+import com.mineee.util.JsonPArrayRequest;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -34,10 +36,11 @@ public class ProfileFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     private static final String TAG = ProfileFragment.class.getSimpleName();
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
+    private static final String LOGGED_USER_ID = "loggedUserId";
     private static final String ARG_PARAM2 = "param2";
     private static final String ARG_SECTION_NUMBER = "section_number";
 
+    private String loggedUserId;
     private UserProfileData item = null;
 
     private String URL_FEED="http://mineee.com/api/index.php?rquest=getUserProfileDetails&user_id=311&loggedinUserid=311&device=mineee";
@@ -48,9 +51,10 @@ public class ProfileFragment extends Fragment {
 
 
     // TODO: Rename and change types and number of parameters
-    public static ProfileFragment newInstance(int sectionNumber) {
+    public static ProfileFragment newInstance(int sectionNumber, String loggedUserId) {
         ProfileFragment fragment = new ProfileFragment();
         Bundle args = new Bundle();
+        args.putString(LOGGED_USER_ID, loggedUserId);
         args.putInt(ARG_SECTION_NUMBER, sectionNumber);
         fragment.setArguments(args);
         return fragment;
@@ -66,6 +70,8 @@ public class ProfileFragment extends Fragment {
         if (getArguments() != null) {
             /*mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);*/
+            loggedUserId = getArguments().getString(LOGGED_USER_ID);
+            URL_FEED = "http://mineee.com/api/index.php?rquest=getUserProfileDetails&user_id="+loggedUserId+"&loggedinUserid="+loggedUserId+"&device=mineee";
         }
     }
 
@@ -73,39 +79,44 @@ public class ProfileFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View profView = inflater.inflate(R.layout.fragment_profile, container, false);
+        final View profView = inflater.inflate(R.layout.fragment_profile, container, false);
 
-        JsonPObjectRequest jsonReq = new JsonPObjectRequest(URL_FEED, new Response.Listener<JSONObject>() {
+        JsonPArrayRequest jsonReq = new JsonPArrayRequest(URL_FEED, new Response.Listener<JSONArray>() {
 
             @Override
-            public void onResponse(JSONObject response) {
+            public void onResponse(JSONArray response) {
                 VolleyLog.d(TAG, "Response: " + response.toString());
                 if (response != null) {
                     //hidePDialog();
                     parseJsonFeed(response);
+
+                    if(item != null){
+                        NetworkImageView proPicImage = (NetworkImageView)profView.findViewById(R.id.profPic);
+                        TextView profName = (TextView)profView.findViewById(R.id.profName);
+                        Button following = (Button)profView.findViewById(R.id.following);
+                        Button follower = (Button)profView.findViewById(R.id.follower);
+
+                        proPicImage.setImageUrl("http://mineee.com/img/profilePic/"+item.getProfileImageName(), FeedListAppController.getInstance().getImageLoader());
+                        profName.setText(item.getName());
+                        following.setText(item.getFollowingCount() + "\n following" );
+                        follower.setText(item.getFollowerCount() + "\n followers" );
+
+                    }
                 }
             }
         }, new Response.ErrorListener() {
 
             @Override
             public void onErrorResponse(VolleyError error) {
+                Log.d(TAG,URL_FEED);
                 VolleyLog.d(TAG, "Error: " + error.getMessage());
+                error.printStackTrace();
                 //hidePDialog();
             }
         });
 
-        if(item != null){
-            NetworkImageView proPicImage = (NetworkImageView)profView.findViewById(R.id.profPic);
-            TextView profName = (TextView)profView.findViewById(R.id.profName);
-            Button following = (Button)profView.findViewById(R.id.following);
-            Button follower = (Button)profView.findViewById(R.id.follower);
+        FeedListAppController.getInstance().addToRequestQueue(jsonReq);
 
-            proPicImage.setImageUrl("http://mineee.com/img/profilePic/"+item.getProfileImageName(), FeedListAppController.getInstance().getImageLoader());
-            profName.setText(item.getName());
-            following.setText(item.getFollowingCount() + " following" );
-            follower.setText(item.getFollowerCount() + " followers" );
-
-        }
 
         return profView;
     }
@@ -152,11 +163,11 @@ public class ProfileFragment extends Fragment {
     /**
      * Parsing json reponse and passing the data to feed view list adapter
      * */
-    private void parseJsonFeed(JSONObject response) {
+    private void parseJsonFeed(JSONArray response) {
         try {
 
 
-            JSONObject feedObj = response;
+            JSONObject feedObj = response.getJSONObject(0);
 
             item = new UserProfileData();
 

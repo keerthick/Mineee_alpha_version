@@ -20,4 +20,6 @@
     <string name="add_thing_dialog_title">Open</string>
     <string name="add_thing_dialog_camera">Camera</string>
     <string name="add_thing_dialog_gallery">Gallery</string>
+
+    <string name="cat_propmt" >Select Categories</string>
 </resources>

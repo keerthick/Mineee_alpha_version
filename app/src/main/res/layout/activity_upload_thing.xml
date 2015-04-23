@@ -9,83 +9,96 @@
     android:weightSum="1">
 
 
+    <ScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/scrollView"
+        android:fadeScrollbars="true">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fadeScrollbars="true"
+            android:scrollbars="vertical" >
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:id="@+id/imageView"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Product Name"
+                android:id="@+id/textView" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/name"
+                android:inputType="textCapSentences"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Say Something nice"
+                android:id="@+id/textView2" />
+
+            <EditText
+                android:layout_width="357dp"
+                android:layout_height="64dp"
+                android:id="@+id/desc"
+                android:inputType="textMultiLine"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Categories"
+                android:id="@+id/textView3" />
+
+            <view
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                class="com.mineee.util.MultiSelectSpinner"
+                android:id="@+id/catSpin"
+                android:prompt="@string/cat_propmt"
+
+                android:spinnerMode="dialog" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Option"
+                android:id="@+id/textView4" />
+
+            <Spinner
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/optionSpinner" />
+        </LinearLayout>
+    </ScrollView>
     <Button
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Send"
-        android:id="@+id/send" />
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:text="Share"
+        android:id="@+id/send"
+        android:background="@color/blue_semi_transparent"
+        android:layout_gravity="center_horizontal" />
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="New Button"
-            android:id="@+id/browse"
-            android:layout_below="@+id/imageView"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
-
-        <ImageView
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:id="@+id/imageView"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            />
-    </LinearLayout>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Product Name"
-        android:id="@+id/textView" />
-
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/name" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Say Something nice"
-        android:id="@+id/textView2" />
-
-    <EditText
-        android:layout_width="357dp"
-        android:layout_height="64dp"
-        android:id="@+id/desc" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Categories"
-        android:id="@+id/textView3" />
-
-    <view
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        class="com.mineee.util.MultiSelectSpinner"
-        android:id="@+id/catSpin" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Option"
-        android:id="@+id/textView4" />
-
-    <Spinner
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/optionSpinner" />
-
-
+   <!-- <ImageButton
+        android:layout_width="fill_parent"
+        android:layout_height=wrapcontent
+        android:id="@+id/sharePost"
+        android:background="@color/blue_semi_transparent"
+        android:src="@drawable/ic_launcher"
+        />-->
 </LinearLayout>

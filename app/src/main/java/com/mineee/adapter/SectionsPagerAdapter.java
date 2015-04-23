@@ -22,8 +22,12 @@ import java.util.Locale;
  */
 public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
-    public SectionsPagerAdapter(FragmentManager fm) {
+    private String loggedUserId = null;
+
+    public SectionsPagerAdapter(FragmentManager fm,String loggedUserId) {
         super(fm);
+        this.loggedUserId = loggedUserId;
+
     }
 
     @Override
@@ -32,8 +36,12 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
         // Return a PlaceholderFragment (defined as a static inner class below).
         if(position == 0)
         return NewsFeedListFragment.newInstance(position + 1);
-        else if(position == 1)
-            return ProfileFragment.newInstance(position + 1);
+        else if(position == 1) {
+                if (loggedUserId != null)
+                    return ProfileFragment.newInstance(position + 1,loggedUserId);
+                else
+                   return null;
+        }
         else
             return SettingsFragment.newInstance(position + 1);
     }

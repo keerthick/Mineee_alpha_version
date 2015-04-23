@@ -26,6 +26,7 @@ public class MultiSelectSpinner extends Spinner implements DialogInterface.OnMul
     public MultiSelectSpinner(Context context) {
         super(context);
         _proxyAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item);
+       // _proxyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
         super.setAdapter(_proxyAdapter);
     }
     /**
@@ -36,6 +37,7 @@ public class MultiSelectSpinner extends Spinner implements DialogInterface.OnMul
     public MultiSelectSpinner(Context context, AttributeSet attrs) {
         super(context, attrs);
         _proxyAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item);
+        //_proxyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_item);/
         super.setAdapter(_proxyAdapter);
     }
     /**
@@ -173,4 +175,12 @@ public class MultiSelectSpinner extends Spinner implements DialogInterface.OnMul
         }
         return sb.toString();
     }
+
+    @Override
+    public void setPrompt(CharSequence prompt) {
+        super.setPrompt(prompt);
+    }
+
+
+    //public
 }
