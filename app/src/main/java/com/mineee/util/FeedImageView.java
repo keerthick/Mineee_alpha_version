@@ -3,19 +3,18 @@ package com.mineee.util;
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.ImageLoader.ImageContainer;
 import com.android.volley.toolbox.ImageLoader.ImageListener;
+import com.etsy.android.grid.util.DynamicHeightImageView;
 
 /**
  * Created by keerthick on 4/10/2015.
  */
-public class FeedImageView extends ImageView {
+public class FeedImageView extends DynamicHeightImageView {
 
     public interface ResponseObserver {
         public void onError();
@@ -56,7 +55,7 @@ public class FeedImageView extends ImageView {
     private ImageContainer mImageContainer;
 
     public FeedImageView(Context context) {
-        this(context, null);
+        super(context, null);
     }
 
     public FeedImageView(Context context, AttributeSet attrs) {
@@ -65,7 +64,7 @@ public class FeedImageView extends ImageView {
 
     public FeedImageView(Context context, AttributeSet attrs,
                          int defStyle) {
-        super(context, attrs, defStyle);
+        super(context, attrs);
     }
 
     /*

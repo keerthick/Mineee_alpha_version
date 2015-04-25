@@ -22,4 +22,5 @@
     <string name="add_thing_dialog_gallery">Gallery</string>
 
     <string name="cat_propmt" >Select Categories</string>
+    <string name="title_activity_user_profile_thing_view">UserProfileThingView</string>
 </resources>

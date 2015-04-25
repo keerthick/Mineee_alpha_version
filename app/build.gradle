@@ -29,4 +29,5 @@ dependencies {
     compile 'com.mcxiaoke.volley:library:1.0.15'
     compile 'com.getbase:floatingactionbutton:1.9.0'
     compile 'com.loopj.android:android-async-http:1.4.5'
+    compile 'com.etsy.android.grid:library:1.0.5'
 }

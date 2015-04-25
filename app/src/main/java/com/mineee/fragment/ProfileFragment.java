@@ -1,6 +1,7 @@
 package com.mineee.fragment;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -16,7 +17,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.NetworkImageView;
 import com.mineee.controller.FeedListAppController;
+import com.mineee.fragment.Dialog.UserListDialog;
 import com.mineee.main.R;
+import com.mineee.main.UserProfileThingView;
 import com.mineee.modal.UserProfileData;
 import com.mineee.util.JsonPArrayRequest;
 
@@ -32,16 +35,22 @@ import org.json.JSONObject;
  * Use the {@link ProfileFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ProfileFragment extends Fragment {
+public class ProfileFragment extends Fragment implements View.OnClickListener{
     // TODO: Rename parameter arguments, choose names that match
     private static final String TAG = ProfileFragment.class.getSimpleName();
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+
     private static final String LOGGED_USER_ID = "loggedUserId";
     private static final String ARG_PARAM2 = "param2";
     private static final String ARG_SECTION_NUMBER = "section_number";
 
     private String loggedUserId;
     private UserProfileData item = null;
+    private View profView;
+    private Button had;
+    private Button owns;
+    private Button wants;
+    private Button recommends;
+    private Intent send;
 
     private String URL_FEED="http://mineee.com/api/index.php?rquest=getUserProfileDetails&user_id=311&loggedinUserid=311&device=mineee";
     // TODO: Rename and change types of parameters
@@ -79,7 +88,7 @@ public class ProfileFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        final View profView = inflater.inflate(R.layout.fragment_profile, container, false);
+        profView = inflater.inflate(R.layout.fragment_profile, container, false);
 
         JsonPArrayRequest jsonReq = new JsonPArrayRequest(URL_FEED, new Response.Listener<JSONArray>() {
 
@@ -89,19 +98,7 @@ public class ProfileFragment extends Fragment {
                 if (response != null) {
                     //hidePDialog();
                     parseJsonFeed(response);
-
-                    if(item != null){
-                        NetworkImageView proPicImage = (NetworkImageView)profView.findViewById(R.id.profPic);
-                        TextView profName = (TextView)profView.findViewById(R.id.profName);
-                        Button following = (Button)profView.findViewById(R.id.following);
-                        Button follower = (Button)profView.findViewById(R.id.follower);
-
-                        proPicImage.setImageUrl("http://mineee.com/img/profilePic/"+item.getProfileImageName(), FeedListAppController.getInstance().getImageLoader());
-                        profName.setText(item.getName());
-                        following.setText(item.getFollowingCount() + "\n following" );
-                        follower.setText(item.getFollowerCount() + "\n followers" );
-
-                    }
+                    updateUI();
                 }
             }
         }, new Response.ErrorListener() {
@@ -116,6 +113,21 @@ public class ProfileFragment extends Fragment {
         });
 
         FeedListAppController.getInstance().addToRequestQueue(jsonReq);
+
+        had = (Button)profView.findViewById(R.id.buttonHad);
+        owns = (Button)profView.findViewById(R.id.buttonOwn);
+        wants = (Button)profView.findViewById(R.id.buttonWants);
+        recommends = (Button)profView.findViewById(R.id.buttonRecommends);
+
+        had.setOnClickListener(this);
+        owns.setOnClickListener(this);
+        wants.setOnClickListener(this);
+        recommends.setOnClickListener(this);
+
+        send = new Intent(getActivity(), UserProfileThingView.class);
+
+        send.putExtra("userId","311");
+
 
 
         return profView;
@@ -143,6 +155,40 @@ public class ProfileFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.follower:
+                UserListDialog dialog = new UserListDialog();
+                dialog.show(getActivity().getSupportFragmentManager(),"FOLLWER");
+                break;
+            case R.id.following:
+                UserListDialog dialog1 = new UserListDialog();
+                dialog1.show(getActivity().getSupportFragmentManager(),"FOLLWER");
+                break;
+            case R.id.buttonHad:
+                send.putExtra("option","4");
+                send.putExtra("title","Things I Had");
+                startActivity(send);
+                break;
+            case R.id.buttonOwn:
+                send.putExtra("option","1");
+                send.putExtra("title","Things I Owns");
+                startActivity(send);
+                break;
+            case R.id.buttonWants:
+                send.putExtra("option","3");
+                send.putExtra("title","Things I Wants");
+                startActivity(send);
+                break;
+            case R.id.buttonRecommends:
+                send.putExtra("option","5");
+                send.putExtra("title","Things I Recommends");
+                startActivity(send);
+                break;
+        }
     }
 
     /**
@@ -179,6 +225,24 @@ public class ProfileFragment extends Fragment {
 
         } catch (JSONException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void updateUI(){
+        if(item != null){
+            NetworkImageView proPicImage = (NetworkImageView)profView.findViewById(R.id.profPic);
+            TextView profName = (TextView)profView.findViewById(R.id.profName);
+            Button following = (Button)profView.findViewById(R.id.following);
+            Button follower = (Button)profView.findViewById(R.id.follower);
+
+            follower.setOnClickListener(this);
+            following.setOnClickListener(this);
+
+            proPicImage.setImageUrl("http://mineee.com/img/profilePic/"+item.getProfileImageName(), FeedListAppController.getInstance().getImageLoader());
+            profName.setText(item.getName());
+            following.setText(item.getFollowingCount() + "\n following" );
+            follower.setText(item.getFollowerCount() + "\n followers" );
+
         }
     }
 }

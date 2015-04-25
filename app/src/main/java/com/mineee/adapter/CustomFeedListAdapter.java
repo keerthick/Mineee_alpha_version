@@ -119,7 +119,7 @@ public class CustomFeedListAdapter extends BaseAdapter {
 
         // Feed image
         if (item.getProdImageName() != null) {
-            feedImageView.setImageUrl(item.getImage_path()+item.getProdImageName(), imageLoader);
+            feedImageView.setImageUrl(item.getImage_path() + "320x320/" + item.getProdImageName(), imageLoader);
             feedImageView.setVisibility(View.VISIBLE);
             feedImageView
                     .setResponseObserver(new FeedImageView.ResponseObserver() {

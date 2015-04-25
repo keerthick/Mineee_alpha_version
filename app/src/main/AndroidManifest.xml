@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <uses-feature android:name="android.hardware.camera" />
 
     <application
@@ -64,7 +65,7 @@
             android:name=".TabbedFeedActivity"
             android:icon="@drawable/ic_launcher"
             android:label="@string/title_activity_tabbed_feed"
-            android:logo="@drawable/ic_action_small_logo_mineee" >
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -75,11 +76,18 @@
             android:name=".UploadThingActivity"
             android:label="@string/title_activity_upload_thing" >
 
-            <!--<intent-filter>
+            <!--
+            <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>-->
+            </intent-filter>
+            -->
+        </activity>
+        <activity
+            android:name=".UserProfileThingView"
+            android:label="@string/title_activity_user_profile_thing_view" >
+
         </activity>
     </application>
 

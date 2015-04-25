@@ -1,6 +1,9 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" tools:context="com.mineee.fragment.ProfileFragment">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context="com.mineee.fragment.ProfileFragment">
 
     <!-- TODO: Update blank fragment layout -->
 
@@ -80,25 +83,25 @@
                     android:layout_width="match_parent"
                     android:layout_height="65dp"
                     android:text="Things I Had"
-                    android:id="@+id/button" />
+                    android:id="@+id/buttonHad" />
 
                 <Button
                     android:layout_width="match_parent"
                     android:layout_height="65dp"
                     android:text="Things I Own"
-                    android:id="@+id/button2" />
+                    android:id="@+id/buttonOwn" />
 
                 <Button
                     android:layout_width="match_parent"
                     android:layout_height="65dp"
                     android:text="Things I Wants"
-                    android:id="@+id/button3" />
+                    android:id="@+id/buttonWants" />
 
                 <Button
                     android:layout_width="match_parent"
                     android:layout_height="65dp"
                     android:text="Things I recommends "
-                    android:id="@+id/button4" />
+                    android:id="@+id/buttonRecommends" />
             </LinearLayout>
         </ScrollView>
 
