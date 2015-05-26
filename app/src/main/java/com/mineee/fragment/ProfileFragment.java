@@ -160,13 +160,28 @@ public class ProfileFragment extends Fragment implements View.OnClickListener{
     @Override
     public void onClick(View v) {
         switch (v.getId()){
-            case R.id.follower:
-                UserListDialog dialog = new UserListDialog();
-                dialog.show(getActivity().getSupportFragmentManager(),"FOLLWER");
+            case R.id.follower:{
+             UserListDialog dialog = new UserListDialog();
+                Bundle args = new Bundle();
+                args.putString(LOGGED_USER_ID, loggedUserId);
+                String FEED_URL = "http://mineee.com/api/index.php?rquest=getFollowers&user_id="+loggedUserId+"&user_name=&device=mineee";
+                args.putString("FEED_URL", FEED_URL);
+                args.putString("TITILE", "Followers");
+                dialog.setArguments(args);
+                dialog.show(getActivity().getSupportFragmentManager(),"FOLLOWER" );
+            }
+
                 break;
-            case R.id.following:
-                UserListDialog dialog1 = new UserListDialog();
-                dialog1.show(getActivity().getSupportFragmentManager(),"FOLLWER");
+            case R.id.following: {
+                UserListDialog dialog = new UserListDialog();
+                Bundle args = new Bundle();
+                args.putString(LOGGED_USER_ID, loggedUserId);
+                String FEED_URL = "http://mineee.com/api/index.php?rquest=getFollowing&user_id=" + loggedUserId + "&user_name=&device=mineee";
+                args.putString("FEED_URL", FEED_URL);
+                args.putString("TITILE", "Following");
+                dialog.setArguments(args);
+                dialog.show(getActivity().getSupportFragmentManager(), "FOLLOWING");
+            }
                 break;
             case R.id.buttonHad:
                 send.putExtra("option","4");

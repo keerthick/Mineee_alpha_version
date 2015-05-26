@@ -4,7 +4,6 @@ import android.util.Log;
 
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
-import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonRequest;
@@ -36,10 +35,11 @@ public class JsonPArrayRequest extends JsonRequest<JSONArray> {
             Log.v("Volley","msg");
             String jsonString =
                     new String(response.data, HttpHeaderParser.parseCharset(response.headers));
-            Log.v("Volley",jsonString);
+
 
             jsonString = jsonString.replace("(","");
             jsonString = jsonString.replace(")","");
+            Log.v("Volley:Json String---",jsonString);
             return Response.success(new JSONArray(jsonString),
                     HttpHeaderParser.parseCacheHeaders(response));
         } catch (UnsupportedEncodingException e) {

@@ -92,8 +92,8 @@ public class ProfileContentGridViewAdapter extends BaseAdapter {
         holder.title.setText(data.getProductName());
         if(data.getDescription() != null && !"".equals(data.getDescription()))
             holder.description.setText(data.getDescription());
-        else
-            holder.description.setText("");
+       /* else
+            holder.description.setText("");*/
 
         return row;
     }

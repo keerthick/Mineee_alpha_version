@@ -18,6 +18,9 @@ public class FeedRowData {
     private String likeCount;
     private String description;
     private String optionString;
+    private boolean isUserLiked;
+    private String upId;
+
 
     public String getProfilePhoto() {
         return profilePhoto;
@@ -121,5 +124,25 @@ public class FeedRowData {
         }
 
 
+    }
+
+
+    public boolean isUserLiked() {
+        return isUserLiked;
+    }
+
+    public void setUserLiked(String isUserLiked) {
+        if ("1".equals(isUserLiked))
+            this.isUserLiked = true;
+        else
+            this.isUserLiked = false;
+    }
+
+    public String getUpId() {
+        return upId;
+    }
+
+    public void setUpId(String upId) {
+        this.upId = upId;
     }
 }

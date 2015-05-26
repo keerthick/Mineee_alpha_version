@@ -5,7 +5,8 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_feed_main">FeedMainActivity</string>
-    <string name="facebook_app_id">697861076991683</string>
+    <!--<string name="facebook_app_id">697861076991683</string>-->
+    <string name="facebook_app_id">712628048848319</string>
     <string name="title_activity_tabbed_feed">Mineee!!!!!!</string>
 
 

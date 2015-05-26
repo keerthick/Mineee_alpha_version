@@ -7,6 +7,7 @@
     android:background="@drawable/background_gradient"
     tools:context="com.mineee.main.MineeeSplashActivity">
 
+
     <!--<ImageView
         android:id="@+id/imgLogo"
         android:layout_width="wrap_content"
@@ -14,15 +15,46 @@
         android:layout_centerInParent="true"
         android:src="@drawable/dddd" />-->
 
-    <com.facebook.login.widget.LoginButton
-        android:id="@+id/loginButton"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/imageView2"
+        android:src="@drawable/dddd"/>
 
-        android:gravity="center_horizontal"
-        android:layout_alignParentBottom="true"
-        />
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:weightSum="1">
+
+        <com.facebook.login.widget.LoginButton
+            android:id="@+id/fbLoginButton"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+
+            android:gravity="center_horizontal"
+            android:layout_alignParentBottom="true"
+             />
+
+        <com.google.android.gms.common.SignInButton
+            android:id="@+id/gLoginButton"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="30dip"
+            android:enabled="false"
+             />
+
+       <!-- <Button
+            android:id="@+id/sign_out_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="sign out"
+            android:enabled="false" />-->
+
+    </LinearLayout>
+
+
 
     <!--<view
         android:layout_width="wrap_content"

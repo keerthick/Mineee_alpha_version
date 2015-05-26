@@ -15,7 +15,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import com.android.volley.Cache;
 import com.android.volley.Response;
@@ -44,7 +46,7 @@ import java.util.Locale;
 /**
  * Created by keerthick on 4/4/2015.
  */
-public class NewsFeedListFragment extends Fragment {
+public class NewsFeedListFragment extends Fragment implements AbsListView.OnScrollListener{
 
     // Log tag
     private static final String TAG = NewsFeedListFragment.class.getSimpleName();
@@ -53,9 +55,14 @@ public class NewsFeedListFragment extends Fragment {
     private static final int RESULT_LOAD_CAMERA = 100;
     private static final int RESULT_LOAD_IMAGE = 101;
     private static final int ADD_NEW_ITEM_RELOAD = 102;
-    // Movies json URL_FEED
-    //private static final String URL_FEED = "http://api.androidhive.info/json/movies.json";
-    private static final String URL_FEED = "http://mineee.com/api/index.php?rquest=getWall&user_id=311&start=1&device=mineee";
+
+    private String loggedUserId ;
+
+    private int visibleThreshold = 5;
+    private int currentPage = 0;
+    private int previousTotal = 0;
+
+    private String URL_FEED = "http://mineee.com/api/index.php?rquest=getWall&user_id=@@@&start=1&device=mineee";
     private ProgressDialog pDialog;
 
     private List<FeedRowData> feedList = new ArrayList<FeedRowData>();
@@ -64,10 +71,14 @@ public class NewsFeedListFragment extends Fragment {
     //private CustomListAdapter adapter;
 
     private AddFloatingActionButton fab;
-
     private CustomFeedListAdapter listAdapter;
-
     private Uri fileUri;
+    private boolean isLoading = false;
+    private int currentFirstVisibleItem;
+    private int currentVisibleItemCount;
+    private int currentScrollState;
+    private int totalItemCount;
+    private ProgressBar progressBar;
 
     public NewsFeedListFragment(){
         Log.d(TAG,"NewsFeedListFragment");
@@ -90,8 +101,18 @@ public class NewsFeedListFragment extends Fragment {
                              final Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_tabbed_feed, container, false);
         listView = (ListView) rootView.findViewById(R.id.list);
-        listAdapter = new CustomFeedListAdapter(this.getActivity(), feedList);
+        listAdapter = new CustomFeedListAdapter(this.getActivity(),this.getActivity().getSupportFragmentManager(), feedList);
         listView.setAdapter(listAdapter);
+        listView.setOnScrollListener(this);
+
+        Intent data = this.getActivity().getIntent();
+        loggedUserId = data.getStringExtra("userId");
+
+        URL_FEED = URL_FEED.replace("@@@",loggedUserId);
+
+
+        progressBar = (ProgressBar)rootView.findViewById(R.id.progressBarEndOfList);
+        updatePBarUI(false);
 
         fab = (AddFloatingActionButton) rootView.findViewById(R.id.updateNew);
 
@@ -171,7 +192,7 @@ public class NewsFeedListFragment extends Fragment {
                     VolleyLog.d(TAG, "Response: " + response.toString());
                     if (response != null) {
                         hidePDialog();
-                        feedList.clear();
+                        //feedList.clear();
                         parseJsonFeed(response);
                     }
                 }
@@ -212,6 +233,8 @@ public class NewsFeedListFragment extends Fragment {
                 item.setLikeCount(feedObj.getString("likeCount"));
                 item.setDescription(feedObj.getString("description"));
                 item.setTimeStamp(feedObj.getString("dt_ct"));
+                item.setUserLiked(feedObj.getString("isUserLiked"));
+                item.setUpId(feedObj.getString("up_id"));
 
                 feedList.add(item);
             }
@@ -281,7 +304,64 @@ public class NewsFeedListFragment extends Fragment {
         }
 
         if(requestCode == ADD_NEW_ITEM_RELOAD && resultCode == Activity.RESULT_OK ){
+            feedList.clear();
             fetchJson(URL_FEED+"&random="+Math.random(),false);
+        }
+    }
+
+    @Override
+    public void onScrollStateChanged(AbsListView view, int scrollState) {
+        /*this.currentScrollState = scrollState;
+        Log.d(TAG,"ScrollState :"+scrollState)*/;
+        //isScrollCompleted();
+    }
+
+    @Override
+    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+        this.currentFirstVisibleItem = firstVisibleItem;
+        this.currentVisibleItemCount = visibleItemCount;
+        this.totalItemCount = totalItemCount;
+
+        Log.d(TAG,"currentVisibleItemCount :"+currentVisibleItemCount);
+
+        if (isLoading) {
+            if (totalItemCount > previousTotal) {
+                isLoading = false;
+                previousTotal = totalItemCount;
+                currentPage++;
+            }
+        }
+        if (!isLoading && (totalItemCount - visibleItemCount) <= (firstVisibleItem + visibleThreshold)) {
+            // I load the next page of gigs using a background task,
+            // but you can call any function here.
+            //new LoadGigsTask().execute(currentPage + 1);
+            isScrollCompleted();
+            isLoading = true;
+        }
+    }
+
+    private void isScrollCompleted() {
+        //if (this.currentVisibleItemCount > 0 && this.currentScrollState == SCROLL_STATE_IDLE) {
+            /*** In this way I detect if there's been a scroll which has completed ***/
+            /*** do the work for load more date! ***/
+            URL_FEED = "http://mineee.com/api/index.php?rquest=getWall&user_id="+loggedUserId+"&start="+(totalItemCount+1)+"&device=mineee";
+          //  if(!isLoading){
+
+                updatePBarUI(true);
+                //isLoading = true;
+                fetchJson(URL_FEED + "&random=" + Math.random(), false);
+                updatePBarUI(false);
+            //}
+        //}
+    }
+
+    private void updatePBarUI(boolean show){
+        if(progressBar != null) {
+            if (show) {
+                progressBar.setVisibility(View.VISIBLE);
+            } else {
+                progressBar.setVisibility(View.GONE);
+            }
         }
     }
 }
