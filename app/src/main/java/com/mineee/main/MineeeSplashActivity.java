@@ -32,6 +32,7 @@ import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListe
 import com.google.android.gms.plus.Plus;
 import com.mineee.controller.FeedListAppController;
 import com.mineee.modal.LoggedUserSessionData;
+import com.mineee.modal.SessionPreferencesManager;
 import com.mineee.util.JsonPArrayRequest;
 
 import org.json.JSONArray;
@@ -73,6 +74,11 @@ public class MineeeSplashActivity extends Activity  implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if(SessionPreferencesManager.contains(getApplicationContext(),"LOGGED_USER_ID")){
+            startNextIntent();
+            return;
+        }
         FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_mineee_splash);
 
@@ -195,8 +201,7 @@ public class MineeeSplashActivity extends Activity  implements
                                 "oauth2:" + Scopes.PLUS_LOGIN);
 
                         URL_FEED = "http://mineee.com/api/index.php?rquest=AuthenticateInsert&accessToken="+ token+"&oauthProvider=2&device=mineee";
-                        showProgressBar();
-                        fetchUserId(URL_FEED);
+
                     } catch (IOException transientEx) {
                         // Network or server error, try later
                         Log.e(TAG, transientEx.toString());
@@ -218,6 +223,8 @@ public class MineeeSplashActivity extends Activity  implements
                 @Override
                 protected void onPostExecute(String token) {
                     Log.i(TAG, "Access token retrieved:" + token);
+                    showProgressBar();
+                    fetchUserId(URL_FEED);
                 }
 
             };
@@ -328,6 +335,8 @@ public class MineeeSplashActivity extends Activity  implements
             session.setLoggedUserId(feedObj.getString("id"));
             session.setName(feedObj.getString("name"));
 
+            SessionPreferencesManager.setLoggedUserID(getApplicationContext(),feedObj.getString("id"));
+
             Log.d(TAG, feedObj.getString("id"));
             Log.d(TAG,feedObj.getString("name"));
 
@@ -353,9 +362,11 @@ public class MineeeSplashActivity extends Activity  implements
 
     private void startNextIntent(){
          Intent i = new Intent(MineeeSplashActivity.this, TabbedFeedActivity.class);
-                i.putExtra("accesstoken",accessToken.getToken());
+                if(accessToken != null)
+                    i.putExtra("accesstoken",accessToken.getToken());
                 if(session != null)
                     i.putExtra("userId", session.getLoggedUserId());
                 startActivity(i);
+                this.finish();
     }
 }

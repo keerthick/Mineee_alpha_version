@@ -29,6 +29,7 @@ import com.mineee.controller.FeedListAppController;
 import com.mineee.main.R;
 import com.mineee.main.UploadThingActivity;
 import com.mineee.modal.FeedRowData;
+import com.mineee.modal.SessionPreferencesManager;
 import com.mineee.util.JsonPArrayRequest;
 
 import org.json.JSONArray;
@@ -107,6 +108,8 @@ public class NewsFeedListFragment extends Fragment implements AbsListView.OnScro
 
         Intent data = this.getActivity().getIntent();
         loggedUserId = data.getStringExtra("userId");
+        //if(loggedUserId == null)
+        loggedUserId = SessionPreferencesManager.getLoggedUserID(this.getActivity().getApplicationContext());
 
         URL_FEED = URL_FEED.replace("@@@",loggedUserId);
 
