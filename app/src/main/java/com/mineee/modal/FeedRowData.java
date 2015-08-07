@@ -21,6 +21,8 @@ public class FeedRowData {
     private boolean isUserLiked;
     private String upId;
 
+    private FeedLikeUnlikeModel likeData;
+
 
     public String getProfilePhoto() {
         return profilePhoto;
@@ -144,5 +146,32 @@ public class FeedRowData {
 
     public void setUpId(String upId) {
         this.upId = upId;
+    }
+
+    public FeedLikeUnlikeModel getLikeData() {
+        return likeData;
+    }
+
+    public void setLikeData(FeedLikeUnlikeModel likeData) {
+        this.likeData = likeData;
+    }
+
+    @Override
+    public String toString() {
+        return "FeedRowData{" +
+                "timeStamp='" + timeStamp + '\'' +
+                ", profilePhoto='" + profilePhoto + '\'' +
+                ", feedUserId=" + feedUserId +
+                ", name='" + name + '\'' +
+                ", unique_Name='" + unique_Name + '\'' +
+                ", prodImageName='" + prodImageName + '\'' +
+                ", image_path='" + image_path + '\'' +
+                ", productName='" + productName + '\'' +
+                ", likeCount='" + likeCount + '\'' +
+                ", description='" + description + '\'' +
+                ", optionString='" + optionString + '\'' +
+                ", isUserLiked=" + isUserLiked +
+                ", upId='" + upId + '\'' +
+                '}';
     }
 }

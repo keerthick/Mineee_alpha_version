@@ -20,6 +20,7 @@ import com.mineee.controller.FeedListAppController;
 import com.mineee.fragment.Dialog.UserListDialog;
 import com.mineee.main.R;
 import com.mineee.main.UserProfileThingView;
+import com.mineee.modal.SessionPreferencesManager;
 import com.mineee.modal.UserProfileData;
 import com.mineee.util.JsonPArrayRequest;
 
@@ -80,6 +81,10 @@ public class ProfileFragment extends Fragment implements View.OnClickListener{
             /*mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);*/
             loggedUserId = getArguments().getString(LOGGED_USER_ID);
+            if(SessionPreferencesManager.contains(this.getActivity().getApplicationContext(), "LOGGED_USER_ID")) {
+                loggedUserId = SessionPreferencesManager.getLoggedUserID(this.getActivity().getApplicationContext());
+                Log.d(TAG,loggedUserId);
+            }
             URL_FEED = "http://mineee.com/api/index.php?rquest=getUserProfileDetails&user_id="+loggedUserId+"&loggedinUserid="+loggedUserId+"&device=mineee";
         }
     }

@@ -13,14 +13,25 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.mineee.controller.FeedListAppController;
 import com.mineee.fragment.Dialog.UserListDialog;
 import com.mineee.main.R;
+import com.mineee.modal.FeedLikeUnlikeModel;
 import com.mineee.modal.FeedRowData;
+import com.mineee.modal.SessionPreferencesManager;
 import com.mineee.util.FeedImageView;
+import com.mineee.util.JsonPArrayRequest;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.List;
 
@@ -34,12 +45,15 @@ public class CustomFeedListAdapter extends BaseAdapter {
     private Activity activity;
     private LayoutInflater inflater;
     private List<FeedRowData> feedItems;
+    private List<FeedLikeUnlikeModel> feedActionItems;
     private FragmentManager supportFragmentManager;
     ImageLoader imageLoader = FeedListAppController.getInstance().getImageLoader();
 
-    public CustomFeedListAdapter(Activity activity, FragmentManager supportFragmentManager, List<FeedRowData> feedItems) {
+    private String URL_FEED = "http://mineee.com/api/index.php?rquest=unlike&up_id=<up_id>&user_id=@@@&device=mineee";
+    public CustomFeedListAdapter(Activity activity, FragmentManager supportFragmentManager, List<FeedRowData> feedItems, List<FeedLikeUnlikeModel> feedActionItems) {
         this.activity = activity;
         this.feedItems = feedItems;
+        this.feedActionItems = feedActionItems;
         this.supportFragmentManager = supportFragmentManager;
     }
 
@@ -60,6 +74,8 @@ public class CustomFeedListAdapter extends BaseAdapter {
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
+
+        FeedRowData item = feedItems.get(position);
 
         final FeedViewHolder holder;
         if (inflater == null)
@@ -86,10 +102,13 @@ public class CustomFeedListAdapter extends BaseAdapter {
 
             holder.likeBt = (Button)convertView.findViewById(R.id.likeButton);
 
+            //holder.likeBt.setTag(item);
+            holder.likeBt.setTag(feedActionItems.get(position));
             convertView.setTag(holder);
         }
         else{
             holder = (FeedViewHolder)convertView.getTag();
+            //holder.likeBt.setTag(item);
         }
 
         if (imageLoader == null)
@@ -97,7 +116,7 @@ public class CustomFeedListAdapter extends BaseAdapter {
 
 
 
-        FeedRowData item = feedItems.get(position);
+
 
         holder.name.setText(item.getName());
         holder.prodName.setText(item.getProductName());
@@ -108,11 +127,14 @@ public class CustomFeedListAdapter extends BaseAdapter {
                 Long.parseLong(item.getTimeStamp()),
                 System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS);*/
         //DateUtils.
+
         if(item.isUserLiked())
+        //if(((FeedRowData) holder.likeBt.getTag()).isUserLiked())
             holder.likeBt.setText("UnLike");
         else
             holder.likeBt.setText("Like");
         holder.likeCt.setText(item.getLikeCount()+"+ likes");
+        //holder.likeCt.setText(((FeedRowData) holder.likeBt.getTag()).getLikeCount()+"+ likes");
         holder.timestamp.setText(item.getTimeStamp());
 
         // Check for empty status message
@@ -149,15 +171,40 @@ public class CustomFeedListAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
 
-                FeedRowData data = feedItems.remove(position);
+                //FeedViewHolder holder = (FeedViewHolder)v.getTag();
+                if(holder instanceof FeedViewHolder){
+                    Log.d(TAG,"FeedViewHolder");
+                }
+                if(holder.likeBt instanceof Button){
+                    Log.d(TAG,"Button");
+                }
+                if(holder.likeBt.getTag() instanceof FeedViewHolder)
+                    Log.d(TAG,"getTag:--->FeedViewHolder");
+
+                Log.d(TAG,(holder.likeBt.getTag()).toString());
+                //FeedRowData data = (FeedRowData) (holder.likeBt.getTag());
+                FeedLikeUnlikeModel data = (FeedLikeUnlikeModel) (holder.likeBt.getTag());
                 Log.d(TAG, "postion:"+position);
+                Log.d(TAG, "UP_id: on click listener" + data.getUpId());
+                String loggedUserId = null;
+                if(SessionPreferencesManager.contains(activity.getApplicationContext(), "LOGGED_USER_ID")) {
+                    loggedUserId = SessionPreferencesManager.getLoggedUserID(activity.getApplicationContext());
+
+                }
+                Log.d(TAG,loggedUserId);
                 if(data.isUserLiked()) {
                     holder.likeBt.setText("Like");
                     String count = data.getLikeCount();
                     data.setLikeCount((Integer.parseInt(count) - 1) + "");
                     holder.likeCt.setText(data.getLikeCount() + "+ likes");
                     data.setUserLiked("0");
-                    feedItems.add(position, data);
+                    Log.d(TAG, "UP_id:" + data.getUpId());
+
+                    URL_FEED = "http://mineee.com/api/index.php?rquest=unlike&up_id="+data.getUpId()+"&user_id="+loggedUserId+"&device=mineee";
+                    //feedItems.add(position, data);
+
+
+                    fetchJson(URL_FEED, count, "UNLIKE");
                 }
                 else{
                     holder.likeBt.setText("Unlike");
@@ -165,12 +212,19 @@ public class CustomFeedListAdapter extends BaseAdapter {
                     data.setLikeCount((Integer.parseInt(count) + 1) + "");
                     holder.likeCt.setText(data.getLikeCount() + "+ likes");
                     data.setUserLiked("1");
-                    feedItems.add(position, data);
+                    //feedItems.add(position, data);
+
+                    Log.d(TAG, "UP_id:" + data.getUpId());
+
+                    URL_FEED = "http://mineee.com/api/index.php?rquest=like&up_id="+data.getUpId()+"&user_id="+loggedUserId+"&device=mineee";
+                    fetchJson(URL_FEED, count, "LIKE");
                 }
+
+                Log.d(TAG,feedItems.toString());
             }
         });
 
-        holder.likeBt.setTag(holder);
+        //holder.likeBt.setTag(holder);
 
         holder.likeCt.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -211,5 +265,73 @@ public class CustomFeedListAdapter extends BaseAdapter {
         TextView likeCt;
         TextView option;
         Button likeBt;
+    }
+
+    private void fetchJson(final String URL_FEED, final String prevCt, final String action){
+
+        // making fresh volley request and getting json
+        JsonPArrayRequest jsonReq = new JsonPArrayRequest(URL_FEED, new Response.Listener<JSONArray>() {
+
+            @Override
+            public void onResponse(JSONArray response) {
+                VolleyLog.d(TAG, "Response: " + response.toString());
+                if (response != null) {
+                    parseJsonFeed(response, prevCt, action);
+                }
+            }
+        }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                VolleyLog.d(TAG, "Error: " + error.getMessage());
+                error.getStackTrace();
+                Log.d(TAG, URL_FEED);
+                Toast.makeText(activity, "Unable to set your like/Unlike -error in request call", Toast.LENGTH_SHORT)
+                        .show();
+                //hidePDialog();
+            }
+        });
+
+        // Adding request to volley request queue
+        FeedListAppController.getInstance().addToRequestQueue(jsonReq);
+
+    }
+    /**
+     * Parsing json reponse and passing the data to feed view list adapter
+     * */
+    private void parseJsonFeed(JSONArray response, String prevCt, String action) {
+        try {
+            JSONArray feedArray = response;
+
+            for (int i = 0; i < feedArray.length(); i++) {
+                JSONObject feedObj = (JSONObject) feedArray.get(i);
+                String newCnt = feedObj.getString("cnt");
+                int newCntInt = Integer.parseInt(newCnt.trim());
+                int prevCntInt = Integer.parseInt(prevCt.trim());
+
+                Log.d(TAG,"newCount"+newCnt+"----prevcount"+prevCt);
+                if("LIKE".equals(action)){
+                    if(newCntInt > prevCntInt){
+
+                    }
+                    else{
+                        Toast.makeText(activity, "Unable to set your like action", Toast.LENGTH_SHORT)
+                                .show();
+                    }
+                }else if("UNLIKE".equals(action)){
+                    if(newCntInt < prevCntInt){
+
+                    }
+                    else{
+                        Toast.makeText(activity, "Unable to set your unlike action", Toast.LENGTH_SHORT)
+                                .show();
+                    }
+                }
+
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -24,10 +24,12 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.getbase.floatingactionbutton.AddFloatingActionButton;
+import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.mineee.adapter.CustomFeedListAdapter;
 import com.mineee.controller.FeedListAppController;
 import com.mineee.main.R;
 import com.mineee.main.UploadThingActivity;
+import com.mineee.modal.FeedLikeUnlikeModel;
 import com.mineee.modal.FeedRowData;
 import com.mineee.modal.SessionPreferencesManager;
 import com.mineee.util.JsonPArrayRequest;
@@ -66,12 +68,15 @@ public class NewsFeedListFragment extends Fragment implements AbsListView.OnScro
     private String URL_FEED = "http://mineee.com/api/index.php?rquest=getWall&user_id=@@@&start=1&device=mineee";
     private ProgressDialog pDialog;
 
-    private List<FeedRowData> feedList = new ArrayList<FeedRowData>();
+    private List<FeedRowData> feedList;
+
+    private List<FeedLikeUnlikeModel> feedActionItems;
 
     private ListView listView;
     //private CustomListAdapter adapter;
 
     private AddFloatingActionButton fab;
+    private FloatingActionButton topFab;
     private CustomFeedListAdapter listAdapter;
     private Uri fileUri;
     private boolean isLoading = false;
@@ -82,7 +87,7 @@ public class NewsFeedListFragment extends Fragment implements AbsListView.OnScro
     private ProgressBar progressBar;
 
     public NewsFeedListFragment(){
-        Log.d(TAG,"NewsFeedListFragment");
+        Log.d(TAG, "NewsFeedListFragment");
     }
 
     /**
@@ -94,7 +99,33 @@ public class NewsFeedListFragment extends Fragment implements AbsListView.OnScro
         Bundle args = new Bundle();
         args.putInt(ARG_SECTION_NUMBER, sectionNumber);
         fragment.setArguments(args);
+
         return fragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        feedList = new ArrayList<FeedRowData>();
+        feedActionItems = new ArrayList<FeedLikeUnlikeModel>();
+        listAdapter = new CustomFeedListAdapter(this.getActivity(),this.getActivity().getSupportFragmentManager(), feedList, feedActionItems);
+
+    }
+
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if(listAdapter != null) {
+            Log.d(TAG,"onResuming list view ");
+            listAdapter.notifyDataSetInvalidated();
+            feedList.clear();
+            listAdapter.notifyDataSetChanged();
+            fetchJson(URL_FEED, true);
+
+        }
     }
 
     @Override
@@ -102,20 +133,35 @@ public class NewsFeedListFragment extends Fragment implements AbsListView.OnScro
                              final Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_tabbed_feed, container, false);
         listView = (ListView) rootView.findViewById(R.id.list);
-        listAdapter = new CustomFeedListAdapter(this.getActivity(),this.getActivity().getSupportFragmentManager(), feedList);
+//        listAdapter = new CustomFeedListAdapter(this.getActivity(),this.getActivity().getSupportFragmentManager(), feedList);
         listView.setAdapter(listAdapter);
         listView.setOnScrollListener(this);
 
-        Intent data = this.getActivity().getIntent();
-        loggedUserId = data.getStringExtra("userId");
-        //if(loggedUserId == null)
-        loggedUserId = SessionPreferencesManager.getLoggedUserID(this.getActivity().getApplicationContext());
 
-        URL_FEED = URL_FEED.replace("@@@",loggedUserId);
+
+        Intent data = this.getActivity().getIntent();
+        //loggedUserId = data.getStringExtra("userId");
+        //if(loggedUserId == null)
+        Log.d(TAG,SessionPreferencesManager.contains(this.getActivity().getApplicationContext(),"LOGGED_USER_ID")+"");
+        if(SessionPreferencesManager.contains(this.getActivity().getApplicationContext(),"LOGGED_USER_ID")) {
+            loggedUserId = SessionPreferencesManager.getLoggedUserID(this.getActivity().getApplicationContext());
+            Log.d(TAG,loggedUserId);
+        }
+        if(loggedUserId != null)
+            URL_FEED = URL_FEED.replace("@@@",loggedUserId);
+        //else
+            //throw new Exception("User ID null");
 
 
         progressBar = (ProgressBar)rootView.findViewById(R.id.progressBarEndOfList);
         updatePBarUI(false);
+        topFab = (FloatingActionButton) rootView.findViewById(R.id.backToTop);
+        topFab.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                listView.setSelectionAfterHeaderView();
+            }
+        });
 
         fab = (AddFloatingActionButton) rootView.findViewById(R.id.updateNew);
 
@@ -187,6 +233,8 @@ public class NewsFeedListFragment extends Fragment implements AbsListView.OnScro
             }
 
         }else {
+
+            Log.d(TAG,"Without cacha ---------->"+URL_FEED);
             // making fresh volley request and getting json
             JsonPArrayRequest jsonReq = new JsonPArrayRequest(URL_FEED, new Response.Listener<JSONArray>() {
 
@@ -239,6 +287,12 @@ public class NewsFeedListFragment extends Fragment implements AbsListView.OnScro
                 item.setUserLiked(feedObj.getString("isUserLiked"));
                 item.setUpId(feedObj.getString("up_id"));
 
+                FeedLikeUnlikeModel likeData = new FeedLikeUnlikeModel();
+                likeData.setUpId(feedObj.getString("up_id"));
+                likeData.setUserLiked(feedObj.getString("isUserLiked"));
+                likeData.setLikeCount(feedObj.getString("likeCount"));
+
+                feedActionItems.add(likeData);
                 feedList.add(item);
             }
 
@@ -325,7 +379,7 @@ public class NewsFeedListFragment extends Fragment implements AbsListView.OnScro
         this.currentVisibleItemCount = visibleItemCount;
         this.totalItemCount = totalItemCount;
 
-        Log.d(TAG,"currentVisibleItemCount :"+currentVisibleItemCount);
+        //Log.d(TAG,"currentVisibleItemCount :"+currentVisibleItemCount);
 
         if (isLoading) {
             if (totalItemCount > previousTotal) {
@@ -338,6 +392,7 @@ public class NewsFeedListFragment extends Fragment implements AbsListView.OnScro
             // I load the next page of gigs using a background task,
             // but you can call any function here.
             //new LoadGigsTask().execute(currentPage + 1);
+            Log.d(TAG,"currentVisibleItemCount :"+currentVisibleItemCount);
             isScrollCompleted();
             isLoading = true;
         }
@@ -347,6 +402,10 @@ public class NewsFeedListFragment extends Fragment implements AbsListView.OnScro
         //if (this.currentVisibleItemCount > 0 && this.currentScrollState == SCROLL_STATE_IDLE) {
             /*** In this way I detect if there's been a scroll which has completed ***/
             /*** do the work for load more date! ***/
+        if(SessionPreferencesManager.contains(this.getActivity().getApplicationContext(),"LOGGED_USER_ID")) {
+            loggedUserId = SessionPreferencesManager.getLoggedUserID(this.getActivity().getApplicationContext());
+            Log.d(TAG,loggedUserId);
+        }
             URL_FEED = "http://mineee.com/api/index.php?rquest=getWall&user_id="+loggedUserId+"&start="+(totalItemCount+1)+"&device=mineee";
           //  if(!isLoading){
 

@@ -10,10 +10,20 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:divider="@color/list_divider"
-        android:dividerHeight="1dp"/>
+        android:dividerHeight="1dp"
+        />
         <!--android:listSelector="@drawable/list_row_selector" />-->
 
+    <com.getbase.floatingactionbutton.FloatingActionButton
+        android:id="@+id/backToTop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
 
+        fab:fab_colorNormal="@color/blue_semi_transparent"
+        fab:fab_colorPressed="@color/blue_semi_transparent_pressed"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
     <com.getbase.floatingactionbutton.AddFloatingActionButton
         android:id="@+id/updateNew"
@@ -23,8 +33,8 @@
         fab:fab_colorNormal="@color/blue_semi_transparent"
         fab:fab_colorPressed="@color/blue_semi_transparent_pressed"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignLeft="@+id/backToTop"
+        android:layout_alignStart="@+id/backToTop" />
 
     <ProgressBar
         android:layout_width="wrap_content"

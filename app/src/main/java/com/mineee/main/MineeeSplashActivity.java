@@ -68,7 +68,7 @@ public class MineeeSplashActivity extends Activity  implements
     LoggedUserSessionData session ;
     AccessToken accessToken;
 
-    private ProgressDialog pDialog;
+    public ProgressDialog pDialog;
 
 
     @Override
@@ -183,6 +183,7 @@ public class MineeeSplashActivity extends Activity  implements
         mSignInClicked = false;
         String accessToken = "";
         try {
+            showProgressBar();
             /*accessToken = GoogleAuthUtil.getToken(
                     getApplicationContext(),
                     Plus.AccountApi.getAccountName(mGoogleApiClient), "oauth2:"
@@ -223,7 +224,7 @@ public class MineeeSplashActivity extends Activity  implements
                 @Override
                 protected void onPostExecute(String token) {
                     Log.i(TAG, "Access token retrieved:" + token);
-                    showProgressBar();
+
                     fetchUserId(URL_FEED);
                 }
 
@@ -289,6 +290,7 @@ public class MineeeSplashActivity extends Activity  implements
             case R.id.gLoginButton:
                 // Signin button clicked
                 signInWithGplus();
+
                 break;
         }
     }

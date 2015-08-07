@@ -224,7 +224,7 @@ public class UploadThingActivity extends ActionBarActivity implements View.OnCli
                         options);
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                 // Must compress the Image to reduce image size to make upload easy
-                bitmap.compress(Bitmap.CompressFormat.PNG, 50, stream);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 50, stream);
                 byte[] byte_arr = stream.toByteArray();
                 // Encode Image to String
                 encodedString = Base64.encodeToString(byte_arr, 0);
@@ -262,7 +262,7 @@ public class UploadThingActivity extends ActionBarActivity implements View.OnCli
         prgDialog.setMessage("Invoking Php");
         AsyncHttpClient client = new AsyncHttpClient();
         // Don't forget to change the IP address to your LAN address. Port no as well.
-        
+        client.setTimeout(50000);
         client.post(URL_ADD,
                 params, new AsyncHttpResponseHandler() {
                     // When the response returned by REST has Http
